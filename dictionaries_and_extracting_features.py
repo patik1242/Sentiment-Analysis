@@ -26,31 +26,6 @@ strong_negative_words = {
     "ruined","ruin","sucks","sucked","hurt","damage","damaging","dangerous"
 }
 
-weak_irrelevant_words = {
-    "today","tomorrow","yesterday","people","time","thing","things","someone","anyone",
-    "everyone","something","anything","nothing","maybe","probably","kind","sort",
-    "still","again","only","really","actually","already","soon","later","early",
-    "often","sometimes","usually","never","always"
-}
-
-strong_irrelevant_words = {
-    "rt","lol","omg","pls","http","https","www","com","tweet","tweets","twitter",
-    "hashtag","tag","link","links","click","follow","followers","retweet","dm",
-    "bio","profile","username","account","view","views","video"
-}
-
-weak_neutral_words = {
-    "maybe","perhaps","possible","likely","general","overall","context","situation",
-    "standard","typical","regular","common","normal","average","mostly","partly",
-    "somewhat","slightly","barely","approximately","mainly","simply","generally"
-}
-
-strong_neutral_words = {
-    "report","information","data","analysis","summary","statistics","statement",
-    "reference","details","results","update","figure","table","system","process",
-    "method","procedure","feature","value","values","metric","dataset",
-    "documentation","record","records","structure","category","class","label"
-}
 
 def extract_features(text):
     # Inicjalizacja liczników i cech binarnych
