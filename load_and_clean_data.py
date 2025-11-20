@@ -3,7 +3,7 @@ from preprocess import preprocess
 
 def load_and_clean_data():
     # Wczytanie datasetów bez nagłówków (oryginalny format Kaggle'a)
-    training_dataset = pd.read_csv("twitter_training.csv", header=None)
+    training_dataset = pd.read_csv("data/twitter_training.csv", header=None)
 
     # Nadanie nazw kolumnom – ułatwia dalsze przetwarzanie i selekcję
     training_dataset.columns = ["id", "topic", "sentiment", "text"]
