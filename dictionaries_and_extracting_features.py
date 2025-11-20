@@ -1,0 +1,113 @@
+weak_positive_words = {
+    "good","nice","well","fine","pleasant","happy","glad","like","liked","likes",
+    "helpful","useful","support","supporting","satisfied","okay","ok","decent",
+    "positive","appreciate","enjoy","enjoyed","enjoying","clear","simple","fair",
+    "reasonable","improve","improving","improved","safe","stable","smooth",
+    "correct","proper","welcome","benefit","beneficial"
+}
+
+strong_positive_words = {
+    "excellent","amazing","great","fantastic","wonderful","love","loved","awesome",
+    "perfect","brilliant","incredible","superb","outstanding","best","successful",
+    "success","win","winning","strong","strongly","highly","recommend","recommended"
+}
+
+weak_negative_words = {
+    "bad","poor","unhappy","dislike","issue","problem","concern","weak","wrong",
+    "confusing","unclear","boring","slow","annoyed","tired","worse","low","minor",
+    "unsure","uncertain","doubt","complain","complaining","complaint","hard",
+    "difficult","negative","lacking","miss","missing","unprepared","unreliable"
+}
+
+
+strong_negative_words = {
+    "terrible","horrible","awful","disgusting","hate","worst","failure","fail",
+    "broken","useless","worthless","angry","furious","disaster","catastrophe",
+    "ruined","ruin","sucks","sucked","hurt","damage","damaging","dangerous"
+}
+
+weak_irrelevant_words = {
+    "today","tomorrow","yesterday","people","time","thing","things","someone","anyone",
+    "everyone","something","anything","nothing","maybe","probably","kind","sort",
+    "still","again","only","really","actually","already","soon","later","early",
+    "often","sometimes","usually","never","always"
+}
+
+strong_irrelevant_words = {
+    "rt","lol","omg","pls","http","https","www","com","tweet","tweets","twitter",
+    "hashtag","tag","link","links","click","follow","followers","retweet","dm",
+    "bio","profile","username","account","view","views","video"
+}
+
+weak_neutral_words = {
+    "maybe","perhaps","possible","likely","general","overall","context","situation",
+    "standard","typical","regular","common","normal","average","mostly","partly",
+    "somewhat","slightly","barely","approximately","mainly","simply","generally"
+}
+
+strong_neutral_words = {
+    "report","information","data","analysis","summary","statistics","statement",
+    "reference","details","results","update","figure","table","system","process",
+    "method","procedure","feature","value","values","metric","dataset",
+    "documentation","record","records","structure","category","class","label"
+}
+
+def extract_features(text):
+    weak_pos=strong_pos=weak_neg=strong_neg = 0 
+    positive_ratio= negative_ratio= 0
+    is_positive_dominant= is_negative_dominant = 0
+    has_link=starts_with_RT= digit_count = 0
+    has_hashtag = 0 
+
+    words = text.split()
+    text_len = len(words) if len(words)>0 else 1
+    for w in words:
+        token = w.lstrip("#")
+        if token in weak_positive_words:
+            weak_pos+=1
+        elif token in strong_positive_words:
+            strong_pos+=1
+        elif token in weak_negative_words:
+            weak_neg+=1
+        elif token in strong_negative_words:
+            strong_neg+=1 
+        elif w.startswith("#"):
+            has_hashtag =1
+
+    positive_ratio = (weak_pos+ strong_pos)/(text_len+1)
+    negative_ratio = (weak_neg+strong_neg)/(text_len+1)
+
+
+    if positive_ratio- negative_ratio>0.1:
+        is_positive_dominant= 1
+
+    if negative_ratio- positive_ratio>0.1:
+        is_negative_dominant= 1
+    
+    if "http" in text.lower():
+        has_link = 1
+    
+    clean = text.strip().upper()
+    if clean.startswith("RT "):
+        starts_with_RT = 1
+    
+    for char in text:
+        if char.isdigit():
+            digit_count+=1
+    
+
+    polarity = positive_ratio-negative_ratio
+    return {
+        "weak_pos": weak_pos, 
+        "strong_pos": strong_pos,
+        "weak_neg": weak_neg, 
+        "strong_neg": strong_neg,
+        "is_positive_dominant": is_positive_dominant,
+        "is_negative_dominant": is_negative_dominant,
+        "word_count": text_len,
+        "polarity": polarity,
+        "has_link": has_link, 
+        "starts_with_RT": starts_with_RT,
+        "digit_count": digit_count,
+        "has_hashtag": has_hashtag
+    }
