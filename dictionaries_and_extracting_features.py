@@ -53,60 +53,72 @@ strong_neutral_words = {
 }
 
 def extract_features(text):
-    weak_pos=strong_pos=weak_neg=strong_neg = 0 
-    positive_ratio= negative_ratio= 0
-    is_positive_dominant= is_negative_dominant = 0
-    has_link=starts_with_RT= digit_count = 0
-    has_hashtag = 0 
+    # Inicjalizacja liczników i cech binarnych
+    # (wszystkie wartości startują od 0, co upraszcza późniejsze zliczanie)
+    weak_pos = strong_pos = weak_neg = strong_neg = 0
+    positive_ratio = negative_ratio = 0
+    is_positive_dominant = is_negative_dominant = 0
+    has_link = starts_with_RT = digit_count = 0
+    has_hashtag = 0
 
+    # Podział tekstu na tokeny
     words = text.split()
-    text_len = len(words) if len(words)>0 else 1
+    text_len = len(words) if len(words) > 0 else 1  # zabezpieczenie przed dzieleniem przez zero
+
+    # Główna pętla zliczająca obecność słów z kategorii sentymentu
     for w in words:
-        token = w.lstrip("#")
+        token = w.lstrip("#")  # usuwa # aby poprawnie zliczać słowa typu "#good"
+
         if token in weak_positive_words:
-            weak_pos+=1
+            weak_pos += 1
         elif token in strong_positive_words:
-            strong_pos+=1
+            strong_pos += 1
         elif token in weak_negative_words:
-            weak_neg+=1
+            weak_neg += 1
         elif token in strong_negative_words:
-            strong_neg+=1 
+            strong_neg += 1
         elif w.startswith("#"):
-            has_hashtag =1
+            # Oddzielnie wykrywane są wszystkie hashtagi
+            has_hashtag = 1
 
-    positive_ratio = (weak_pos+ strong_pos)/(text_len+1)
-    negative_ratio = (weak_neg+strong_neg)/(text_len+1)
+    # Proporcja pozytywnych i negatywnych słów względem długości tekstu
+    positive_ratio = (weak_pos + strong_pos) / text_len
+    negative_ratio = (weak_neg + strong_neg) / text_len
 
+    # Flagi dominacji sentymentu – wykrywamy wyraźną przewagę jednej strony
+    if positive_ratio - negative_ratio > 0.1:
+        is_positive_dominant = 1
+    if negative_ratio - positive_ratio > 0.1:
+        is_negative_dominant = 1
 
-    if positive_ratio- negative_ratio>0.1:
-        is_positive_dominant= 1
-
-    if negative_ratio- positive_ratio>0.1:
-        is_negative_dominant= 1
-    
+    # Detekcja linków
     if "http" in text.lower():
         has_link = 1
-    
+
+    # Detekcja retweetów (RT ...)
     clean = text.strip().upper()
     if clean.startswith("RT "):
         starts_with_RT = 1
-    
+
+    # Liczenie wszystkich cyfr w tweecie – przydatne do wykrywania dat, czasu, liczb
     for char in text:
         if char.isdigit():
-            digit_count+=1
-    
+            digit_count += 1
 
-    polarity = positive_ratio-negative_ratio
+    # Ogólna polaryzacja tekstu (różnica między pozytywnymi/negatywnymi)
+    polarity = positive_ratio - negative_ratio
+
+    # Zwrócenie kompletu cech w formacie słownika
     return {
-        "weak_pos": weak_pos, 
+        "weak_pos": weak_pos,
         "strong_pos": strong_pos,
-        "weak_neg": weak_neg, 
+        "weak_neg": weak_neg,
         "strong_neg": strong_neg,
         "is_positive_dominant": is_positive_dominant,
         "is_negative_dominant": is_negative_dominant,
         "word_count": text_len,
         "polarity": polarity,
-        "has_link": has_link, 
+        "has_link": has_link,
         "starts_with_RT": starts_with_RT,
         "digit_count": digit_count,
         "has_hashtag": has_hashtag
